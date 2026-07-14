@@ -1,0 +1,2 @@
+class VitalRecord < ApplicationRecord
+end

@@ -1,0 +1,47 @@
+<%= form_with(model: vital_record) do |form| %>
+  <% if vital_record.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(vital_record.errors.count, "error") %> prohibited this vital_record from being saved:</h2>
+
+      <ul>
+        <% vital_record.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :recorded_at, style: "display: block" %>
+    <%= form.datetime_field :recorded_at %>
+  </div>
+
+  <div>
+    <%= form.label :weight, style: "display: block" %>
+    <%= form.text_field :weight %>
+  </div>
+
+  <div>
+    <%= form.label :blood_sugar, style: "display: block" %>
+    <%= form.number_field :blood_sugar %>
+  </div>
+
+  <div>
+    <%= form.label :systolic_pressure, style: "display: block" %>
+    <%= form.number_field :systolic_pressure %>
+  </div>
+
+  <div>
+    <%= form.label :diastolic_pressure, style: "display: block" %>
+    <%= form.number_field :diastolic_pressure %>
+  </div>
+
+  <div>
+    <%= form.label :memo, style: "display: block" %>
+    <%= form.textarea :memo %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

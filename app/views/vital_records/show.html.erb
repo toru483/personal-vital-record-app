@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @vital_record %>
+
+<div>
+  <%= link_to "Edit this vital record", edit_vital_record_path(@vital_record) %> |
+  <%= link_to "Back to vital records", vital_records_path %>
+
+  <%= button_to "Destroy this vital record", @vital_record, method: :delete %>
+</div>

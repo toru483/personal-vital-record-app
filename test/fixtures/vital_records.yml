@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  recorded_at: 2026-07-14 00:45:25
+  weight: 9.99
+  blood_sugar: 1
+  systolic_pressure: 1
+  diastolic_pressure: 1
+  memo: MyText
+
+two:
+  recorded_at: 2026-07-14 00:45:25
+  weight: 9.99
+  blood_sugar: 1
+  systolic_pressure: 1
+  diastolic_pressure: 1
+  memo: MyText

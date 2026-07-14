@@ -1,0 +1,11 @@
+<% content_for :title, "New vital record" %>
+
+<h1>New vital record</h1>
+
+<%= render "form", vital_record: @vital_record %>
+
+<br>
+
+<div>
+  <%= link_to "Back to vital records", vital_records_path %>
+</div>
