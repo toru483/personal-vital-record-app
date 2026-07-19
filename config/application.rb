@@ -23,5 +23,14 @@ module VitalCheck
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    
+    # デフォルトの言語設定を日本語(ja)にする
+    config.i18n.default_locale = :ja
+    
+    # 💡 タイムゾーンを日本時間(JST)に設定
+    config.time_zone = 'Tokyo'
+    config.active_record.default_timezone = :local
+
+
   end
 end

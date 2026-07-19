@@ -1,16 +1,36 @@
 <p style="color: green"><%= notice %></p>
 
-<% content_for :title, "Vital records" %>
+<h1>📊 <%= t(".title") %></h1>
 
-<h1>Vital records</h1>
+<%# 💡 エクセル風のテーブル（表形式）の作成 %>
+<table border="1" style="border-collapse: collapse; width: 100%; text-align: left; margin-top: 20px; margin-bottom: 20px;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:recorded_at) %></th>
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:weight) %></th>
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:blood_sugar) %></th>
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:systolic_pressure) %></th>
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:diastolic_pressure) %></th>
+      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:memo) %></th>
+      <th style="padding: 10px; text-align: center;">アクション</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @vital_records.each do |vital_record| %>
+      <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px;"><%= vital_record.recorded_at&.strftime("%Y-%m-%d %H:%M") %></td>
+        <td style="padding: 10px;"><%= vital_record.weight %> kg</td>
+        <td style="padding: 10px;"><%= vital_record.blood_sugar %> mg/dL</td>
+        <td style="padding: 10px;"><%= vital_record.systolic_pressure %></td>
+        <td style="padding: 10px;"><%= vital_record.diastolic_pressure %></td>
+        <td style="padding: 10px;"><%= vital_record.memo %></td>
+        <td style="padding: 10px; text-align: center;">
+          <%= link_to t("helpers.submit.show"), vital_record %> | 
+          <%= link_to "編集", edit_vital_record_path(vital_record) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-<div id="vital_records">
-  <% @vital_records.each do |vital_record| %>
-    <%= render vital_record %>
-    <p>
-      <%= link_to "Show this vital record", vital_record %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New vital record", new_vital_record_path %>
+<%= link_to t(".new_link"), new_vital_record_path, style: "display: inline-block; padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;" %>

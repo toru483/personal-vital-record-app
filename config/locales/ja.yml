@@ -1,0 +1,26 @@
+ja:
+  # 💡 画面用の翻訳設定
+  vital_records:
+    index:
+      title: "バイタル記録一覧"
+      new_link: "➕ 新しいバイタル記録を登録する"
+
+  # 💡 モデルやボタン用の共通翻訳設定
+  activerecord:
+    models:
+      vital_record: "バイタル記録"
+    attributes:
+      vital_record:
+        recorded_at: "記録日時"
+        weight: "体重 (kg)"
+        blood_sugar: "血糖値 (mg/dL)"
+        systolic_pressure: "最高血圧 (上)"
+        diastolic_pressure: "最低血圧 (下)"
+        memo: "メモ"
+
+  # 💡 共通アクション（詳細など）の翻訳設定
+  helpers:
+    submit:
+      show: "詳細を見る"
+      create: "%{model}を登録する"
+      update: "%{model}を更新する"
