@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    # 同一フォルダ内にあるDockerfileを使ってビルドします
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # ソースコードをコンテナ内と同期させます
+    volumes:
+      - ..:/workspaces/personal-vital-record-app:cached
+
+    # コンテナが勝手に終了しないようにするおまじない
+    command: sleep infinity
+
+    # ポート3000番（Rails）を開放します
+    ports:
+      - "3000:3000"
+
+    # 今回はSQLite3を使うため、環境変数 DATABASE_URL や dbコンテナの記述は不要です

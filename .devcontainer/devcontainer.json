@@ -1,0 +1,19 @@
+{
+    "name": "Personal Vital Record App",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile"
+    },
+    "workspaceFolder": "/workspaces/personal-vital-record-app",
+    "forwardPorts": [
+        3000
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "MS-CEINTL.vscode-language-pack-ja",
+                "shopify.ruby-lsp"
+            ]
+        }
+    }
+}
