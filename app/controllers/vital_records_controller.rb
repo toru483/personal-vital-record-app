@@ -2,9 +2,19 @@ class VitalRecordsController < ApplicationController
   before_action :set_vital_record, only: %i[ show edit update destroy ]
 
   # GET /vital_records or /vital_records.json
+  # GET /vital_records or /vital_records.json
   def index
-    @vital_records = VitalRecord.all
+    @vital_records = VitalRecord.all.order(recorded_at: :desc)
+
+    # 💡 過去10日間のデータを取得して平均値を計算するロジックを追加
+    recent_records = VitalRecord.where(recorded_at: 10.days.ago.beginning_of_day..Time.current.end_of_day)
+
+    @avg_weight = recent_records.average(:weight)&.round(1) # 小数点第1位まで
+    @avg_blood_sugar = recent_records.average(:blood_sugar)&.round(0) # 整数
+    @avg_systolic = recent_records.average(:systolic_pressure)&.round(0)
+    @avg_diastolic = recent_records.average(:diastolic_pressure)&.round(0)
   end
+
 
   # GET /vital_records/1 or /vital_records/1.json
   def show
