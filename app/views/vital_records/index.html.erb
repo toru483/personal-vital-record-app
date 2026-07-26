@@ -2,6 +2,50 @@
 
 <h1>📊 <%= t(".title") %></h1>
 
+<%# 💡 既存の <h1>📊 <%= t(".title") % > のすぐ下に挿入します %>
+<%# 💡 以前のクイックレコードのブロックを、このコードに丸ごと差し替えてください %>
+
+<div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 20px; overflow: hidden;">
+  <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">📝 クイックレコード（エクセル風入力）</h3>
+  
+  <%= form_with(model: VitalRecord.new, local: true) do |form| %>
+    <%= form.hidden_field :recorded_at, value: Time.current.strftime('%Y-%m-%dT%H:%M') %>
+
+    <%# 💡 各項目を inline-block にして、強制的に横並びに整列させます %>
+    
+    <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :weight, VitalRecord.human_attribute_name(:weight), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.number_field :weight, step: "0.1", inputmode: "decimal", placeholder: "65.0", style: "padding: 8px; width: 90px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
+
+    <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :blood_sugar, VitalRecord.human_attribute_name(:blood_sugar), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.number_field :blood_sugar, inputmode: "numeric", placeholder: "100", style: "padding: 8px; width: 100px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
+
+    <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :systolic_pressure, VitalRecord.human_attribute_name(:systolic_pressure), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.number_field :systolic_pressure, inputmode: "numeric", placeholder: "120", style: "padding: 8px; width: 90px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
+
+    <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :diastolic_pressure, VitalRecord.human_attribute_name(:diastolic_pressure), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.number_field :diastolic_pressure, inputmode: "numeric", placeholder: "80", style: "padding: 8px; width: 90px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
+
+    <div style="display: inline-block; margin-right: 15px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :memo, VitalRecord.human_attribute_name(:memo), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.text_field :memo, placeholder: "体調など", style: "padding: 8px; width: 360px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
+
+    <div style="display: inline-block; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.submit "⚡ クイック登録", style: "padding: 8px 18px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; height: 37px;" %>
+    </div>
+
+  <% end %>
+</div>
+
+
 <%# 💡 エクセル風のテーブル（表形式）の作成 %>
 <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; margin-top: 20px; margin-bottom: 20px;">
   <thead>
@@ -31,6 +75,17 @@
       </tr>
     <% end %>
   </tbody>
+    <!-- 💡 </tbody> のすぐ下に貼り付けます -->
+  <tfoot>
+    <tr style="background-color: #e9ecef; font-weight: bold; border-top: 2px solid #6c757d;">
+      <td style="padding: 10px;">📋 過去10日分平均</td>
+      <td style="padding: 10px;"><%= @avg_weight ? "#{@avg_weight} kg" : "-" %></td>
+      <td style="padding: 10px;"><%= @avg_blood_sugar ? "#{@avg_blood_sugar} mg/dL" : "-" %></td>
+      <td style="padding: 10px;"><%= @avg_systolic || "-" %></td>
+      <td style="padding: 10px;"><%= @avg_diastolic || "-" %></td>
+      <td style="padding: 10px;" colspan="2">※自動計算（データがある期間のみ）</td>
+    </tr>
+  </tfoot>
 </table>
 
 <%= link_to t(".new_link"), new_vital_record_path, style: "display: inline-block; padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;" %>
