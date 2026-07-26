@@ -2,16 +2,21 @@
 
 <h1>📊 <%= t(".title") %></h1>
 
-<%# 💡 既存の <h1>📊 <%= t(".title") % > のすぐ下に挿入します %>
-<%# 💡 以前のクイックレコードのブロックを、このコードに丸ごと差し替えてください %>
+<%# 💡 3秒で消える中央ポップアップメッセージ %>
+<div id="flash-message" style="display: none; position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background-color: #28a745; color: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; font-size: 1.3rem;">
+  ⚡ クイック登録完了
+</div>
 
 <div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 20px; overflow: hidden;">
   <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">📝 クイックレコード（エクセル風入力）</h3>
   
-  <%= form_with(model: VitalRecord.new, local: true) do |form| %>
-    <%= form.hidden_field :recorded_at, value: Time.current.strftime('%Y-%m-%dT%H:%M') %>
+  <% # 💡 標準的なフォームに戻します（idを追加） %>
+  <%= form_with(model: VitalRecord.new, local: true, id: "quick-record-form") do |form| %>
 
-    <%# 💡 各項目を inline-block にして、強制的に横並びに整列させます %>
+    <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
+      <%= form.label :recorded_at, VitalRecord.human_attribute_name(:recorded_at), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
+      <%= form.datetime_field :recorded_at, value: Time.current.strftime('%Y-%m-%dT%H:%M'), style: "padding: 8px; width: 200px; border: 1px solid #ced4da; border-radius: 4px;" %>
+    </div>
     
     <div style="display: inline-block; margin-right: 12px; margin-bottom: 10px; vertical-align: bottom;">
       <%= form.label :weight, VitalRecord.human_attribute_name(:weight), style: "display: block; font-size: 0.85rem; font-weight: bold; color: #495057; margin-bottom: 5px;" %>
@@ -38,43 +43,64 @@
       <%= form.text_field :memo, placeholder: "体調など", style: "padding: 8px; width: 360px; border: 1px solid #ced4da; border-radius: 4px;" %>
     </div>
 
+    <%# 💡 ボタンが押された瞬間、標準機能(onclick)で3秒ポップアップを表示してからデータを送信します %>
     <div style="display: inline-block; margin-bottom: 10px; vertical-align: bottom;">
-      <%= form.submit "⚡ クイック登録", style: "padding: 8px 18px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; height: 37px;" %>
+      <%= form.button "⚡ クイック登録", type: "button", onclick: "submitWithPopup()", style: "padding: 8px 18px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; height: 37px;" %>
     </div>
 
   <% end %>
 </div>
 
+<script>
+  // 💡 ボタンが押された時に確実に実行されるJavaScript関数
+  function submitWithPopup() {
+    var flash = document.getElementById("flash-message");
+    var form = document.getElementById("quick-record-form");
+    
+    if (flash && form) {
+      // 1. 画面中央に登録完了ポップアップを即座に表示
+      flash.style.display = "block";
+      
+      // 2. 2.5秒（2500ミリ秒）後に、裏側でフォームデータを送信（送信されると自動で画面がリロードされます）
+      setTimeout(function() {
+        form.submit();
+      }, 2500);
+    }
+  }
+</script>
 
 <%# 💡 エクセル風のテーブル（表形式）の作成 %>
-<table border="1" style="border-collapse: collapse; width: 100%; text-align: left; margin-top: 20px; margin-bottom: 20px;">
-  <thead>
-    <tr style="background-color: #f2f2f2;">
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:recorded_at) %></th>
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:weight) %></th>
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:blood_sugar) %></th>
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:systolic_pressure) %></th>
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:diastolic_pressure) %></th>
-      <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:memo) %></th>
-      <th style="padding: 10px; text-align: center;">アクション</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @vital_records.each do |vital_record| %>
-      <tr style="border-bottom: 1px solid #ddd;">
-        <td style="padding: 10px;"><%= vital_record.recorded_at&.strftime("%Y-%m-%d %H:%M") %></td>
-        <td style="padding: 10px;"><%= vital_record.weight %> kg</td>
-        <td style="padding: 10px;"><%= vital_record.blood_sugar %> mg/dL</td>
-        <td style="padding: 10px;"><%= vital_record.systolic_pressure %></td>
-        <td style="padding: 10px;"><%= vital_record.diastolic_pressure %></td>
-        <td style="padding: 10px;"><%= vital_record.memo %></td>
-        <td style="padding: 10px; text-align: center;">
-          <%= link_to t("helpers.submit.show"), vital_record %> | 
-          <%= link_to "編集", edit_vital_record_path(vital_record) %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
+<div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 20px; overflow: hidden;">
+  <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">📝 測定値登録履歴＆平均値</h3>
+    <table border="1" style="border-collapse: collapse; width: 100%; text-align: left; margin-top: 20px; margin-bottom: 20px;">
+      <thead>
+        <tr style="background-color: #f2f2f2;">
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:recorded_at) %></th>
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:weight) %></th>
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:blood_sugar) %></th>
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:systolic_pressure) %></th>
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:diastolic_pressure) %></th>
+          <th style="padding: 10px;"><%= VitalRecord.human_attribute_name(:memo) %></th>
+          <th style="padding: 10px; text-align: center;">アクション</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @vital_records.each do |vital_record| %>
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 10px;"><%= vital_record.recorded_at&.strftime("%Y-%m-%d %H:%M") %></td>
+            <td style="padding: 10px;"><%= vital_record.weight %> kg</td>
+            <td style="padding: 10px;"><%= vital_record.blood_sugar %> mg/dL</td>
+            <td style="padding: 10px;"><%= vital_record.systolic_pressure %></td>
+            <td style="padding: 10px;"><%= vital_record.diastolic_pressure %></td>
+            <td style="padding: 10px;"><%= vital_record.memo %></td>
+            <td style="padding: 10px; text-align: center;">
+              <%= link_to t("helpers.submit.show"), vital_record %> | 
+              <%= link_to "編集", edit_vital_record_path(vital_record) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+</div>
     <!-- 💡 </tbody> のすぐ下に貼り付けます -->
   <tfoot>
     <tr style="background-color: #e9ecef; font-weight: bold; border-top: 2px solid #6c757d;">
@@ -88,4 +114,30 @@
   </tfoot>
 </table>
 
-<%= link_to t(".new_link"), new_vital_record_path, style: "display: inline-block; padding: 10px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;" %>
+<%# 💡 ファイルの最下部に追記します %>
+<hr style="border: 0; border-top: 2px dashed #ced4da; margin-top: 40px; margin-bottom: 30px;">
+
+<h2 style="color: #495057; margin-bottom: 20px;">📈 バイタルデータの推移（折れ線グラフ）</h2>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 5px;">
+  <% # ① 体重のグラフ（青色） %>
+  <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
+    <h4 style="margin-top:0; color:#0056b3;">⚖️ 体重 (kg)</h4>
+    <%= line_chart VitalRecord.pluck(:recorded_at, :weight), xtitle: "日時", ytitle: "kg", colors: ["#007bff"] %>
+  </div>
+
+  <% # ② 血糖値のグラフ（赤色） %>
+  <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
+    <h4 style="margin-top:0; color:#bd2130;">🩸 血糖値 (mg/dL)</h4>
+    <%= line_chart VitalRecord.pluck(:recorded_at, :blood_sugar), xtitle: "日時", ytitle: "mg/dL", colors: ["#dc3545"] %>
+  </div>
+
+  <% # ③ 血圧のグラフ（最高・最低の2本線） %>
+  <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
+    <h4 style="margin-top:0; color:#28a745;">🫀 血圧 (mmHg)</h4>
+    <%= line_chart [
+      { name: "最高血圧", data: VitalRecord.pluck(:recorded_at, :systolic_pressure) },
+      { name: "最低血圧", data: VitalRecord.pluck(:recorded_at, :diastolic_pressure) }
+    ], xtitle: "日時", colors: ["#ffc107", "#17a2b8"] %>
+  </div>
+</div>

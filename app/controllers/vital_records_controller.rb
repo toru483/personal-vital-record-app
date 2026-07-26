@@ -33,14 +33,11 @@ class VitalRecordsController < ApplicationController
   def create
     @vital_record = VitalRecord.new(vital_record_params)
 
-    respond_to do |format|
-      if @vital_record.save
-        format.html { redirect_to @vital_record, notice: "Vital record was successfully created." }
-        format.json { render :show, status: :created, location: @vital_record }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @vital_record.errors, status: :unprocessable_content }
-      end
+    if @vital_record.save
+      # 💡 登録が成功したら、画面遷移先の「詳細画面」ではなく「トップ画面（一覧）」へ直接戻す
+      redirect_to vital_records_path
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 

@@ -20,6 +20,10 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    
+    <%# 💡 グラフを描画するための世界標準ライブラリ（Chart.js）を読み込みます %>
+    <script src="https://jsdelivr.net"></script>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>
