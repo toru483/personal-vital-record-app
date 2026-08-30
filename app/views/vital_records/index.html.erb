@@ -6,6 +6,25 @@
 <div id="flash-message" style="display: none; position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background-color: #28a745; color: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; font-size: 1.3rem;">
   ⚡ クイック登録完了
 </div>
+<%# 💡 3秒で消える中央の削除完了ポップアップメッセージ %>
+<div id="delete-flash-message" style="display: none; position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background-color: #dc3545; color: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; font-size: 1.3rem;">
+  🗑️ 削除完了
+</div>
+<%# 💡 Railsから更新成功の合図（flash[:quick_update]）が届いたら、最初から表示する %>
+<% if flash[:quick_update] %>
+  <div id="update-flash-message" style="position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background-color: #ffc107; color: #212529; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; font-size: 1.3rem;">
+    ✏️ 変更完了
+  </div>
+
+  <script>
+    // 💡 画面が開いてから3秒（3000ミリ秒）後に自動で消す
+    setTimeout(function() {
+      var flash = document.getElementById("update-flash-message");
+      if (flash) flash.style.display = "none";
+    }, 3000);
+  </script>
+<% end %>
+
 
 <div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 20px; overflow: hidden;">
   <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">📝 クイックレコード（エクセル風入力）</h3>
@@ -45,7 +64,8 @@
 
     <%# 💡 ボタンが押された瞬間、標準機能(onclick)で3秒ポップアップを表示してからデータを送信します %>
     <div style="display: inline-block; margin-bottom: 10px; vertical-align: bottom;">
-      <%= form.button "⚡ クイック登録", type: "button", onclick: "submitWithPopup()", style: "padding: 8px 18px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; height: 37px;" %>
+      <%# 💡 登録ボタンの箇所を以下のように id を付けた形に修正します %>
+      <%= form.button "⚡ クイック登録", type: "button", id: "quick-submit-btn", onclick: "submitWithPopup()", style: "padding: 8px 18px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; height: 37px;" %>
     </div>
 
   <% end %>
@@ -67,6 +87,75 @@
       }, 2500);
     }
   }
+  // 💡 削除ボタンが押された時に確実に実行されるJavaScript関数
+  function confirmAndDelete(recordId, deleteUrl) {
+    if (confirm("本当に削除しますか？")) {
+      var deleteFlash = document.getElementById("delete-flash-message");
+      
+      if (deleteFlash) {
+        // 1. 画面中央に「削除完了」ポップアップを即座に表示
+        deleteFlash.style.display = "block";
+        
+        // 2. フォームを一時的に作って、RailsにDELETEリクエストを送信する
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = deleteUrl;
+        
+        // Railsのセキュリティ（CSRFトークン）とDELETEメソッドを模倣する隠し要素
+        var methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'delete';
+        form.appendChild(methodInput);
+        
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        var csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+
+        // 3. 2.5秒後にデータを送信して画面をリロード
+        setTimeout(function() {
+          form.submit();
+        }, 2500);
+      }
+    }
+  }
+  // 💡 一覧表の「編集」を押した時、データを上のフォームにセットする関数
+  function editRecordInForm(id, recordedAt, weight, bloodSugar, systolic, diastolic, memo) {
+    // フォーム内の各入力欄に既存の数値をセット
+    document.getElementById("quick-record-form").querySelector('input[type="datetime-local"]').value = recordedAt;
+    document.getElementById("vital_record_weight").value = weight;
+    document.getElementById("vital_record_blood_sugar").value = bloodSugar;
+    document.getElementById("vital_record_systolic_pressure").value = systolic;
+    document.getElementById("vital_record_diastolic_pressure").value = diastolic;
+    document.getElementById("vital_record_memo").value = memo;
+
+    // ボタンの文字と色を「変更保存用」に変え、送信先のURLをパッチ用に切り替える
+    var submitBtn = document.getElementById("quick-submit-btn");
+    submitBtn.value = "⚡ 変更を保存";
+    submitBtn.style.backgroundColor = "#ffc107";
+    submitBtn.style.color = "#212529";
+    
+    // 送信ボタンの動きを「編集保存用（edit）」に切り替える属性をセット
+    submitBtn.setAttribute("onclick", "submitWithUpdatePopup('" + id + "')");
+  }
+  // 💡 「変更を保存」を押した時に、数値を一時保存して編集画面へジャンプする関数
+  function submitWithUpdatePopup(recordId) {
+    // フォームに入力されている最新の数値をブラウザに一時保存（LocalStorage）
+    localStorage.setItem('edit_weight', document.getElementById("vital_record_weight").value);
+    localStorage.setItem('edit_blood_sugar', document.getElementById("vital_record_blood_sugar").value);
+    localStorage.setItem('edit_systolic', document.getElementById("vital_record_systolic_pressure").value);
+    localStorage.setItem('edit_diastolic', document.getElementById("vital_record_diastolic_pressure").value);
+    localStorage.setItem('edit_memo', document.getElementById("vital_record_memo").value);
+
+    // 安全にRails標準の編集画面へ遷移（向こうで自動送信されます）
+    window.location.href = "/vital_records/" + recordId + "/edit";
+  }
+
 </script>
 
 <%# 💡 エクセル風のテーブル（表形式）の作成 %>
@@ -95,7 +184,14 @@
             <td style="padding: 10px;"><%= vital_record.memo %></td>
             <td style="padding: 10px; text-align: center;">
               <%= link_to t("helpers.submit.show"), vital_record %> | 
-              <%= link_to "編集", edit_vital_record_path(vital_record) %>
+              <%# 💡 リンクの代わりにボタンにし、クリック時にデータをフォームへ転記する関数を実行します %>
+              <button type="button" onclick="editRecordInForm('<%= vital_record.id %>', '<%= vital_record.recorded_at&.strftime("%Y-%m-%dT%H:%M") %>', '<%= vital_record.weight %>', '<%= vital_record.blood_sugar %>', '<%= vital_record.systolic_pressure %>', '<%= vital_record.diastolic_pressure %>', '<%= j vital_record.memo %>')" style="background: none; border: none; color: #007bff; cursor: pointer; padding: 0; font-size: 1rem; text-decoration: underline;">
+                編集
+              </button>
+              <%# 💡 リンクではなくボタン形式にし、クリック時にポップアップを制御する関数を実行します %>
+              <button type="button" onclick="confirmAndDelete('<%= vital_record.id %>', '<%= vital_record_path(vital_record) %>')" style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: 1rem; text-decoration: underline;">
+                削除
+              </button>
             </td>
           </tr>
         <% end %>

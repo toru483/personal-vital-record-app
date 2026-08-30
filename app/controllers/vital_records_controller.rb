@@ -43,26 +43,27 @@ class VitalRecordsController < ApplicationController
 
   # PATCH/PUT /vital_records/1 or /vital_records/1.json
   def update
-    respond_to do |format|
-      if @vital_record.update(vital_record_params)
-        format.html { redirect_to @vital_record, notice: "Vital record was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @vital_record }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @vital_record.errors, status: :unprocessable_content }
-      end
+    @vital_record = VitalRecord.find(params[:id])
+
+    if @vital_record.update(vital_record_params)
+      # 💡 編集成功時、トップ画面へ戻しつつ「更新が成功したよ」という合図（flash）を送る
+      redirect_to vital_records_path, flash: { quick_update: true }
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
+
+
 
   # DELETE /vital_records/1 or /vital_records/1.json
   def destroy
-    @vital_record.destroy!
+    @vital_record = VitalRecord.find(params[:id])
+    @vital_record.destroy
 
-    respond_to do |format|
-      format.html { redirect_to vital_records_path, notice: "Vital record was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    # 💡 削除が成功したら、メッセージを伴わずにトップ画面（一覧）へ直接戻す
+    redirect_to vital_records_path
   end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

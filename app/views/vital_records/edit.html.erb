@@ -1,12 +1,30 @@
-<% content_for :title, "Editing vital record" %>
-
-<h1>Editing vital record</h1>
-
-<%= render "form", vital_record: @vital_record %>
-
-<br>
-
-<div>
-  <%= link_to "Show this vital record", @vital_record %> |
-  <%= link_to "Back to vital records", vital_records_path %>
+<div style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #6c757d;">
+  <p>🔄 変更を処理中...</p>
 </div>
+
+<%# 💡 通常の編集フォームを隠し要素（display: none）として配置 %>
+<div style="display: none;">
+  <%= render "form", vital_record: @vital_record %>
+</div>
+
+<script>
+  // 💡 画面が開いた瞬間に、JavaScriptが自動で「保存ボタン」を身代わりに押す
+  document.addEventListener("DOMContentLoaded", function() {
+    // 一覧画面のフォームから送られてきた最新の数値を、この画面のフォームにコピーする
+    var weight = localStorage.getItem('edit_weight');
+    var bloodSugar = localStorage.getItem('edit_blood_sugar');
+    var systolic = localStorage.getItem('edit_systolic');
+    var diastolic = localStorage.getItem('edit_diastolic');
+    var memo = localStorage.getItem('edit_memo');
+
+    if (weight) document.querySelector('input[name="vital_record[weight]"]').value = weight;
+    if (bloodSugar) document.querySelector('input[name="vital_record[blood_sugar]"]').value = bloodSugar;
+    if (systolic) document.querySelector('input[name="vital_record[systolic_pressure]"]').value = systolic;
+    if (diastolic) document.querySelector('input[name="vital_record[diastolic_pressure]"]').value = diastolic;
+    if (memo) document.querySelector('input[name="vital_record[memo]"]').value = memo;
+
+    // 自動で送信
+    var form = document.querySelector('form');
+    if (form) form.submit();
+  });
+</script>
