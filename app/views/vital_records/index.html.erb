@@ -210,6 +210,8 @@
   </tfoot>
 </table>
 
+
+ 
 <%# 💡 ファイルの最下部に追記します %>
 <hr style="border: 0; border-top: 2px dashed #ced4da; margin-top: 40px; margin-bottom: 30px;">
 
@@ -219,21 +221,22 @@
   <% # ① 体重のグラフ（青色） %>
   <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
     <h4 style="margin-top:0; color:#0056b3;">⚖️ 体重 (kg)</h4>
-    <%= line_chart VitalRecord.pluck(:recorded_at, :weight), xtitle: "日時", ytitle: "kg", colors: ["#007bff"] %>
+      <%= line_chart @chart_records.pluck(:recorded_at, :weight), xtitle: "日時", ytitle: "kg", colors: ["#007bff"] %>
   </div>
 
   <% # ② 血糖値のグラフ（赤色） %>
   <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
     <h4 style="margin-top:0; color:#bd2130;">🩸 血糖値 (mg/dL)</h4>
-    <%= line_chart VitalRecord.pluck(:recorded_at, :blood_sugar), xtitle: "日時", ytitle: "mg/dL", colors: ["#dc3545"] %>
+      <%= line_chart @chart_records.pluck(:recorded_at, :blood_sugar), xtitle: "日時", ytitle: "mg/dL", colors: ["#dc3545"] %>
   </div>
 
   <% # ③ 血圧のグラフ（最高・最低の2本線） %>
   <div style="flex: 1; min-width: 300px; background: #fff; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
     <h4 style="margin-top:0; color:#28a745;">🫀 血圧 (mmHg)</h4>
-    <%= line_chart [
-      { name: "最高血圧", data: VitalRecord.pluck(:recorded_at, :systolic_pressure) },
-      { name: "最低血圧", data: VitalRecord.pluck(:recorded_at, :diastolic_pressure) }
-    ], xtitle: "日時", colors: ["#ffc107", "#17a2b8"] %>
+      <%= line_chart [
+        { name: "最高血圧", data: @chart_records.pluck(:recorded_at, :systolic_pressure) },
+        { name: "最低血圧", data: @chart_records.pluck(:recorded_at, :diastolic_pressure) }
+      ], xtitle: "日時", colors: ["#ffc107", "#17a2b8"] %>
   </div>
-</div>
+</div> 
+

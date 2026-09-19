@@ -4,15 +4,18 @@ class VitalRecordsController < ApplicationController
   # GET /vital_records or /vital_records.json
   # GET /vital_records or /vital_records.json
   def index
+    # 💡 履歴一覧テーブルには、今まで通りすべての過去データを表示します
     @vital_records = VitalRecord.all.order(recorded_at: :desc)
 
-    # 💡 過去10日間のデータを取得して平均値を計算するロジックを追加
+    # 📋 過去10日間の平均値を計算
     recent_records = VitalRecord.where(recorded_at: 10.days.ago.beginning_of_day..Time.current.end_of_day)
-
-    @avg_weight = recent_records.average(:weight)&.round(1) # 小数点第1位まで
-    @avg_blood_sugar = recent_records.average(:blood_sugar)&.round(0) # 整数
+    @avg_weight = recent_records.average(:weight)&.round(1)
+    @avg_blood_sugar = recent_records.average(:blood_sugar)&.round(0)
     @avg_systolic = recent_records.average(:systolic_pressure)&.round(0)
     @avg_diastolic = recent_records.average(:diastolic_pressure)&.round(0)
+
+    # 💡 【最速化の仕掛け】下のグラフには、直近30日間のデータだけを渡して計算を圧倒的に軽くする！
+    @chart_records = VitalRecord.where(recorded_at: 30.days.ago.beginning_of_day..Time.current.end_of_day).order(recorded_at: :asc)
   end
 
 
